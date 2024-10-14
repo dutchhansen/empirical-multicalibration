@@ -1,0 +1,11 @@
+0.4: {
+	'batch_size': 64,
+	'lr_schedule': {
+		'0': 0.001,
+	},
+	'weight_decay': 0,
+	'optim': 'adam',
+	'epochs': 50,
+	'arch': [10, 128, 'BN', 256, 'BN', 128, 2],
+	'momentum': None,
+},

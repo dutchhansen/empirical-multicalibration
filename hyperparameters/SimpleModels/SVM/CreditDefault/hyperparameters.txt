@@ -1,0 +1,40 @@
+0: {
+	'alpha': 0.01,
+	'max_iter': 1000,
+	'scale_data': True,
+},
+0.01: {
+	'alpha': 0.0001,
+	'max_iter': 1000,
+	'scale_data': True,
+},
+0.05: {
+	'alpha': 0.01,
+	'max_iter': 1000,
+	'scale_data': True,
+},
+0.1: {
+	'alpha': 0.01,
+	'max_iter': 1000,
+	'scale_data': True,
+},
+0.2: {
+	'alpha': 0.01,
+	'max_iter': 1000,
+	'scale_data': True,
+},
+0.4: {
+	'alpha': 0.01,
+	'max_iter': 1000,
+	'scale_data': True,
+},
+0.6: {
+	'alpha': 0.01,
+	'max_iter': 1000,
+	'scale_data': True,
+},
+0.8: {
+	'alpha': 0.01,
+	'max_iter': 1000,
+	'scale_data': True,
+},

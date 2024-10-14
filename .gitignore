@@ -1,0 +1,11 @@
+__pycache__
+dataloders/__pycache__/*
+data/*
+.DS_STORE
+models/saved_models/*
+models/__pycache__/*
+wandb/*
+plots/*
+.vector_cache/*
+figures/*
+final_figures/*

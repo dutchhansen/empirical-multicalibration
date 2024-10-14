@@ -1,0 +1,88 @@
+0: {
+	'batch_size': 128,
+	'lr_schedule': {
+		'0': 0.001,
+	},
+	'weight_decay': 0,
+	'optim': 'adam',
+	'epochs': 30,
+	'arch': '[89, 128, 'BN', 128, 2]',
+	'momentum': 'None',
+},
+0.01: {
+	'batch_size': 128,
+	'lr_schedule': {
+		'0': 0.001,
+	},
+	'weight_decay': 1e-05,
+	'optim': 'adam',
+	'epochs': 30,
+	'arch': '[89, 128, 'BN', 128, 2]',
+	'momentum': 'None',
+},
+0.05: {
+	'batch_size': 128,
+	'lr_schedule': {
+		'0': 0.001,
+	},
+	'weight_decay': 0,
+	'optim': 'adam',
+	'epochs': 30,
+	'arch': '[89, 100, 2]',
+	'momentum': 'None',
+},
+0.1: {
+	'batch_size': 128,
+	'lr_schedule': {
+		'0': 0.001,
+	},
+	'weight_decay': 1e-05,
+	'optim': 'adam',
+	'epochs': 30,
+	'arch': '[89, 128, 'BN', 128, 2]',
+	'momentum': 'None',
+},
+0.2: {
+	'batch_size': 128,
+	'lr_schedule': {
+		'0': 0.001,
+	},
+	'weight_decay': 0,
+	'optim': 'adam',
+	'epochs': 30,
+	'arch': '[89, 100, 2]',
+	'momentum': 'None',
+},
+0.4: {
+	'batch_size': 128,
+	'lr_schedule': {
+		'0': 0.001,
+	},
+	'weight_decay': 1e-05,
+	'optim': 'adam',
+	'epochs': 30,
+	'arch': '[89, 100, 2]',
+	'momentum': 'None',
+},
+0.6: {
+	'batch_size': 128,
+	'lr_schedule': {
+		'0': 0.001,
+	},
+	'weight_decay': 1e-05,
+	'optim': 'adam',
+	'epochs': 30,
+	'arch': '[89, 100, 2]',
+	'momentum': 'None',
+},
+0.8: {
+	'batch_size': 128,
+	'lr_schedule': {
+		'0': 0.001,
+	},
+	'weight_decay': 0.0001,
+	'optim': 'adam',
+	'epochs': 30,
+	'arch': '[89, 100, 2]',
+	'momentum': 'None',
+},
