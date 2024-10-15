@@ -106,10 +106,10 @@ Using the `get_hyperparameters()` function, this example uses pre-defined hyperp
 
 If you found our code to be useful, please consider citing our work.
 ```
-@article{hansen2024multicalibration,
+@inproceedings{hansen2024multicalibration,
   title={When is Multicalibration Post-Processing Necessary?},
   author={Hansen, Dutch and Devic, Siddartha and Nakkiran, Preetum and Sharan, Vatsal},
-  journal={arXiv preprint arXiv:2406.06487},
+  booktitle={Advances in Neural Information Processing Systems},
   year={2024}
 }
 ```
