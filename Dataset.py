@@ -26,7 +26,8 @@ class Dataset:
                  class_balance=False,
                  val_split_seed=43, 
                  min_group_size=0.005,
-                 verbose=True):
+                 verbose=True,
+                 include_groups_as_features=False):
         '''
         Parameters:
             :dataset_name: str, name of the dataset to load
@@ -44,6 +45,7 @@ class Dataset:
         self.val_split_seed = val_split_seed
         self.train_test_val_split = split
         self.is_text = False
+        self.include_groups_as_features = include_groups_as_features
 
         # Determines if we scale data (normalize to mean 0, std 1) on a by dataset basis
         self.scale = scale
@@ -95,7 +97,8 @@ class Dataset:
             raise ValueError('Unknown dataset name')
         
         self.X, self.y, (self.groups, self.group_names) = load_data_fn(groups=groups)
-        
+        self.num_groups = len(self.groups)
+
         # scale or class balance data
         self._preprocess_data()
         self._check_data_leakage()
@@ -167,10 +170,11 @@ class Dataset:
         Handle assumptions on the data.
             1. Remove groups with lesss than min_group_size of entire data
             2. Require binary classification
-            3. Set fixed test seed
-            4. Ensure valid split fractions
-            5. Split data into train, val, test
-            6. Scale or balance data
+            3. If include_groups_as_features is True, add groups as features
+            4. Set fixed test seed
+            5. Ensure valid split fractions
+            6. Split data into train, val, test
+            7. Scale or balance data
         """
 
         # delete groups with less than min_group_size of entire data
@@ -189,9 +193,35 @@ class Dataset:
         if self.num_classes != 2:
             raise ValueError('Only binary classification supported')
         
+        # if include_groups_as_features is True, add k-hot group membership as features
+        if self.include_groups_as_features:
+            # print the first 5 rows of the original X
+            print('First 5 rows of original X: ', self.X[:5])
+
+            # create k-hot encoded groups for each X[i]
+            print('Original X shape: ', self.X.shape)
+            
+            # Initialize k-hot encoded matrix (n_samples x n_groups)
+            k_hot = np.zeros((len(self.X), len(self.groups)))
+            
+            # For each group, set 1s for samples that belong to that group
+            for group_idx, group in enumerate(self.groups):
+                k_hot[group, group_idx] = 1
+            
+            # If X is 1D (e.g. for text data), reshape it to 2D
+            if len(self.X.shape) == 1:
+                self.X = self.X.reshape(-1, 1)
+            
+            # Append k-hot encoded features to X
+            self.X = np.hstack([self.X, k_hot])
+            print('New X shape after adding group features: ', self.X.shape)
+
+            # As a test, print the first 5 rows of the new X
+            print('First 5 rows of new X: ', self.X[:5])
+
         # construct train, val, test splits
         # always deterministically construct the test split.
-        self.test_split_seed = 42
+        self.test_split_seed = 45
 
         # check for valid split
         if self.train_test_val_split['test'] + self.train_test_val_split['val'] + self.train_test_val_split['train'] > 1:

@@ -20,8 +20,8 @@ class Model:
         save_scheme = kwargs['save_scheme'] if 'save_scheme' in kwargs else 'best-val-acc'
 
         # verify save_scheme
-        assert save_scheme in ['best-val-acc', 'all-epochs']
-        if self.name not in ['DistilBert', 'ViT', 'LanguageResNet']:
+        assert save_scheme in ['best-val-acc', 'all-epochs', 'best-val-loss']
+        if self.name not in ['DistilBert', 'ViT', 'LanguageResNet', 'MLP']:
             err_msg = f'all-epoch saving not supported for {self.name} model.'
             assert (save_scheme == 'best-val-acc'), err_msg
         
@@ -63,7 +63,7 @@ class Model:
         # MLP
         if self.name == 'MLP':
             model_found = True
-            self.model = MLP(self.SAVE_DIR, self.config, from_saved=from_saved)
+            self.model = MLP(self.SAVE_DIR, self.config, from_saved=from_saved, save_scheme=save_scheme)
 
         # Resnet
         elif self.name == 'LanguageResNet':
