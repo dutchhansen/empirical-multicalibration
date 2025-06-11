@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 from datetime import datetime
 import os
+import time
 
 
 class _general_MLP(nn.Module):
@@ -65,12 +66,16 @@ class _general_MLP(nn.Module):
             sample_indices = []
             group_counts = torch.zeros(batch_size, device=x.device)
             
+            time_start = time.perf_counter()
             for i, sample_groups in enumerate(group_memberships):
                 if len(sample_groups) > 0:
                     all_group_indices.extend(sample_groups)
                     sample_indices.extend([i] * len(sample_groups))
                     group_counts[i] = len(sample_groups)
+            time_end = time.perf_counter()
+            print(f"Time taken for group embedding computation: {time_end - time_start} seconds")
             
+            time_start = time.perf_counter()
             # Initialize group embeddings tensor
             group_embeds = torch.zeros(batch_size, self.group_embedding.embedding_dim, device=x.device)
             
@@ -91,6 +96,8 @@ class _general_MLP(nn.Module):
                 mask = group_counts > 0  # [batch_size]
                 if mask.any():
                     group_embeds[mask] = group_embeds[mask] / group_counts[mask].unsqueeze(1)
+            time_end = time.perf_counter()
+            print(f"Time taken for group embedding scatter_add: {time_end - time_start} seconds")
             
             # Concatenate main features with group embeddings
             x = torch.cat([x, group_embeds], dim=1)  # [batch_size, feature_dim + embedding_dim]
@@ -328,13 +335,73 @@ class MLP:
         Convert group membership lists to per-sample group membership lists.
         Returns a list where element i contains the list of group indices that sample i belongs to.
         """
-        group_memberships = [[] for _ in range(n_samples)]
+        
+        # Version 1: Current implementation (double for loop)
+        start_time = time.perf_counter()
+        group_memberships_v1 = [[] for _ in range(n_samples)]
         
         for group_idx, group in enumerate(groups):
             for sample_idx in group:
-                group_memberships[sample_idx].append(group_idx)
+                group_memberships_v1[sample_idx].append(group_idx)
+        
+        time_v1 = time.perf_counter() - start_time
+        
+        # Version 2: Vectorized implementation
+        start_time = time.perf_counter()
+        
+        # Collect all sample-group pairs
+        all_samples = []
+        all_group_ids = []
+        
+        for group_idx, group in enumerate(groups):
+            if len(group) > 0:
+                all_samples.extend(group)
+                all_group_ids.extend([group_idx] * len(group))
+        
+        if not all_samples:
+            group_memberships_v2 = [[] for _ in range(n_samples)]
+        else:
+            # Convert to numpy arrays for faster operations
+            all_samples = np.array(all_samples, dtype=int)
+            all_group_ids = np.array(all_group_ids, dtype=int)
             
-        return group_memberships
+            # Sort by sample index to group memberships together
+            sort_idx = np.argsort(all_samples)
+            sorted_samples = all_samples[sort_idx]
+            sorted_groups = all_group_ids[sort_idx]
+            
+            # Find where samples change using vectorized operations
+            sample_changes = np.concatenate(([True], np.diff(sorted_samples) != 0, [True]))
+            change_indices = np.where(sample_changes)[0]
+            
+            # Initialize result
+            group_memberships_v2 = [[] for _ in range(n_samples)]
+            
+            # Fill in groups for each sample using vectorized slicing
+            for i in range(len(change_indices) - 1):
+                start_idx = change_indices[i]
+                end_idx = change_indices[i + 1]
+                sample_idx = sorted_samples[start_idx]
+                group_memberships_v2[sample_idx] = sorted_groups[start_idx:end_idx].tolist()
+        
+        time_v2 = time.perf_counter() - start_time
+        
+        print('group_memberships_v1', group_memberships_v1)
+        print('group_memberships_v2', group_memberships_v2)
+        # Verify both versions produce the same result
+
+        # Check if the two versions are the same, first convert each to a set of sets
+        set_v1 = set(frozenset(group) for group in group_memberships_v1)
+        set_v2 = set(frozenset(group) for group in group_memberships_v2)
+        assert set_v1 == set_v2, "methods return different results!"
+        
+        # Print timing comparison
+        print(f"_get_group_memberships timing:")
+        print(f"  Original (double loop): {time_v1*1000:.3f}ms")
+        print(f"  Vectorized: {time_v2*1000:.3f}ms")
+        print(f"  Speedup: {time_v1/time_v2:.2f}x" if time_v2 > 0 else "  Speedup: inf")
+        
+        return group_memberships_v1
     
     def load_net(self, arch, from_saved):
         # Pass embedding parameters if using embeddings

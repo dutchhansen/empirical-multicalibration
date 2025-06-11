@@ -92,7 +92,7 @@ class Model:
     def train(self, X_train, y_train, groups_train, X_val, y_val, groups_val):
         self.model.train(X_train, y_train, groups_train, X_val, y_val, groups_val)
     
-    def predict_proba(self, X, with_logits=False):
+    def predict_proba(self, X, with_logits=False, groups=None):
         '''
         Returns positive class probabilities.
         If with_logits=True, returns both probabilities of the 
@@ -105,17 +105,23 @@ class Model:
             else: return p[:, 1]
         
         # nontrivial training set
-        p = self.model.predict_proba(X, with_logits)
+        if groups is not None:
+            p = self.model.predict_proba(X, with_logits=with_logits, groups=groups)
+        else:
+            p = self.model.predict_proba(X, with_logits=with_logits)
         if with_logits: return (p[0][:,1], p[1])
         else: return p[:,1]
 
-    def predict(self, X):
+    def predict(self, X, groups=None):
         # if no training set, select random class
         if self.calib_frac == 1.0:
             return np.random.choice([0, 1], size=X.shape[0])
         
         # nontrivial training set
-        return self.model.predict(X)
+        if groups is not None:
+            return self.model.predict(X, groups=groups)
+        else:
+            return self.model.predict(X)
 
     def load(self):
         if self.name == 'MLP':

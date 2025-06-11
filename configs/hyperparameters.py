@@ -1524,7 +1524,7 @@ hyperparameters = {
         'CivilComments': {
             0: {
                 'max_token_len': 300,
-                'epochs': 10,
+                'epochs': 20,
                 'batch_size': 16,
                 'lr_schedule': {0:1e-5},
                 'weight_decay': 0.01,

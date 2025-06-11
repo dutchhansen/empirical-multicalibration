@@ -195,6 +195,8 @@ class Dataset:
         
         # if include_groups_as_features is True, add k-hot group membership as features
         if self.include_groups_as_features:
+            # Only use on tabular data
+            assert self.name in ['ACSIncome', 'CreditDefault', 'HMDA', 'BankMarketing', 'MEPS', 'AdultIncome'], 'Only supported for tabular data'
             # print the first 5 rows of the original X
             print('First 5 rows of original X: ', self.X[:5])
 

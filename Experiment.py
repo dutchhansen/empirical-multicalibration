@@ -131,8 +131,8 @@ class Experiment:
     
     def evaluate_model(self, X, y, groups, dataset_split_name, with_rel_diagram=False):
         # evaluate orig model and mcb model on the given dataset split
-        preds = self.model.predict(X)
-        (confs, logits) = self.model.predict_proba(X, with_logits=True)
+        preds = self.model.predict(X, groups)
+        (confs, logits) = self.model.predict_proba(X, with_logits=True, groups=groups)
         original_model_metrics_val = subgroup_metrics(groups, y, confs, preds)
 
         # log metrics
