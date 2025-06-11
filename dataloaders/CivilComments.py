@@ -55,38 +55,42 @@ def load_CivilComments(groups='default'):
         This dataset is in the public domain and is distributed under CC0.
         https://creativecommons.org/publicdomain/zero/1.0/
     """
-    DATA_DIR = 'data/civilcomments_v1.0/'
-    # DATASET_NAME = 'CivilComments'
+    DATA_DIR = 'data/CivilComments/'
+    DATASET_NAME = 'CivilComments'
     # This is a stale download link for civil comments.
     # DOWNLOAD_URL = 'https://worksheets.codalab.org/rest/bundles/0x8cd3de0634154aeaad2ee6eb96723c6e/contents/blob/'
     FILE_NAMES = ['all_data_with_identities.csv']
 
     # check if we need to download
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
     if not all([os.path.exists(DATA_DIR + f) for f in FILE_NAMES]):
-        # delete any existing files/dirs
-        files = os.listdir(DATA_DIR)
-        for fn in files:
-            if os.path.exists(DATA_DIR + fn):
-                # if is file / dir
-                if os.path.isfile(DATA_DIR + fn):
-                    os.remove(DATA_DIR + fn)
-                else:
-                    shutil.rmtree(DATA_DIR + fn)
-
-        # download the dataset
-        # download_dataset(DATASET_NAME, DATA_DIR, DOWNLOAD_URL)
-        get_dataset(dataset="civilcomments", download=True)
+        # Clean up any existing data directory
+        if os.path.exists(DATA_DIR):
+            shutil.rmtree(DATA_DIR)
         
-        # delete unnecessary
-        files = os.listdir(DATA_DIR)
-        remove_files = [f for f in files if f not in FILE_NAMES]
-        for fn in remove_files:
-            if os.path.isfile(DATA_DIR + fn):
-                os.remove(DATA_DIR + fn)
-            else: 
-                shutil.rmtree(DATA_DIR + fn)
+        # Clean up any existing download directory  
+        if os.path.exists('data/civilcomments_v1.0/'):
+            shutil.rmtree('data/civilcomments_v1.0/')
+
+        # This is the new download link for civil comments
+        dataset = get_dataset(dataset="civilcomments", download=True)
+        
+        # This downloads the dataset to the data/civilcomments_v1.0/ directory
+        # We need to move it to the data/CivilComments/ directory
+        if os.path.exists('data/civilcomments_v1.0/'):
+            shutil.move('data/civilcomments_v1.0/', DATA_DIR)
+        else:
+            raise FileNotFoundError("Expected download directory 'data/civilcomments_v1.0/' not found after download")
+        
+        # delete unnecessary files, keeping only what we need
+        if os.path.exists(DATA_DIR):
+            files = os.listdir(DATA_DIR)
+            remove_files = [f for f in files if f not in FILE_NAMES]
+            for fn in remove_files:
+                file_path = os.path.join(DATA_DIR, fn)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                else: 
+                    shutil.rmtree(file_path)
 
     # load data
     df = pd.read_csv(DATA_DIR + 'all_data_with_identities.csv', index_col=0)
