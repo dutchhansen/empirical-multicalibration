@@ -79,4 +79,5 @@ def NN_train(model_name, dataset, seeds, include_groups_as_features=False,
 
 
 if __name__ == "__main__":
-    NN_train('DistilBERT', 'CivilComments', SEEDS_DEFAULT, include_groups_as_features=False, group_embedding_dim=0)
+    NN_train('DistilBert', 'CivilComments', SEEDS_DEFAULT, include_groups_as_features=False, group_embedding_dim=0)
+

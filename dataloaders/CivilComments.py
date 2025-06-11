@@ -4,6 +4,8 @@ import pandas as pd
 import torch
 import os
 import shutil
+from wilds import get_dataset
+
 
 def groups_map(features_df, groups='default'):
     df = features_df
@@ -53,9 +55,10 @@ def load_CivilComments(groups='default'):
         This dataset is in the public domain and is distributed under CC0.
         https://creativecommons.org/publicdomain/zero/1.0/
     """
-    DATA_DIR = 'data/CivilComments/'
-    DATASET_NAME = 'CivilComments'
-    DOWNLOAD_URL = 'https://worksheets.codalab.org/rest/bundles/0x8cd3de0634154aeaad2ee6eb96723c6e/contents/blob/'
+    DATA_DIR = 'data/civilcomments_v1.0/'
+    # DATASET_NAME = 'CivilComments'
+    # This is a stale download link for civil comments.
+    # DOWNLOAD_URL = 'https://worksheets.codalab.org/rest/bundles/0x8cd3de0634154aeaad2ee6eb96723c6e/contents/blob/'
     FILE_NAMES = ['all_data_with_identities.csv']
 
     # check if we need to download
@@ -73,7 +76,8 @@ def load_CivilComments(groups='default'):
                     shutil.rmtree(DATA_DIR + fn)
 
         # download the dataset
-        download_dataset(DATASET_NAME, DATA_DIR, DOWNLOAD_URL)
+        # download_dataset(DATASET_NAME, DATA_DIR, DOWNLOAD_URL)
+        get_dataset(dataset="civilcomments", download=True)
         
         # delete unnecessary
         files = os.listdir(DATA_DIR)
